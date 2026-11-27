@@ -21,12 +21,12 @@ export default function CareerFamilyChart({ careerFamilies = [] }) {
     <div className="glass-card flex h-full flex-col p-6">
       <div className="mb-5 flex items-center justify-between gap-2">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             8-Family Distribution
           </p>
-          <h2 className="text-lg font-bold text-white">Career Family Fit</h2>
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white">Career Family Fit</h2>
         </div>
-        <span className="rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-medium text-slate-300 tabular-nums">
+        <span className="rounded-lg border border-slate-200 bg-slate-100/80 px-2.5 py-1 text-[11px] font-medium text-slate-600 tabular-nums dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-300">
           Total: 100%
         </span>
       </div>
@@ -40,10 +40,10 @@ export default function CareerFamilyChart({ careerFamilies = [] }) {
           return (
             <div key={family.name || idx}>
               <div className="mb-1.5 flex items-center justify-between gap-3 text-xs">
-                <span className="truncate font-medium text-slate-200">{family.name}</span>
-                <span className="shrink-0 font-bold text-white tabular-nums">{pct}%</span>
+                <span className="truncate font-medium text-slate-700 dark:text-slate-200">{family.name}</span>
+                <span className="shrink-0 font-bold text-slate-900 tabular-nums dark:text-white">{pct}%</span>
               </div>
-              <div className="h-2.5 w-full overflow-hidden rounded-full bg-white/[0.07]">
+              <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-200/85 dark:bg-white/[0.07]">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${visualWidth}%` }}

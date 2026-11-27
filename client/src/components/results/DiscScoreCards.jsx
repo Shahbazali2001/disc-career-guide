@@ -25,10 +25,10 @@ export default function DiscScoreCards({ scores, primaryTrait, secondaryTrait })
               borderColor: isPrimary ? `${meta.hex}66` : undefined,
               boxShadow: isPrimary ? meta.glowShadow : undefined,
             }}
-            className="glass-card relative overflow-hidden p-5 transition-all duration-300 hover:border-white/20"
+            className="glass-card relative overflow-hidden p-5 transition-all duration-300 hover:border-slate-300 dark:hover:border-white/20"
           >
             <div
-              className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-20 blur-2xl"
+              className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-15 blur-2xl dark:opacity-20"
               style={{ backgroundColor: meta.hex }}
             />
 
@@ -37,15 +37,15 @@ export default function DiscScoreCards({ scores, primaryTrait, secondaryTrait })
                 <span
                   className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-xs font-extrabold"
                   style={{
-                    backgroundColor: `${meta.hex}22`,
+                    backgroundColor: `${meta.hex}20`,
                     border: `1px solid ${meta.hex}55`,
                     color: meta.hex,
                   }}
                 >
                   {meta.key}
                 </span>
-                <h3 className="mt-2.5 text-sm font-bold text-white">{meta.name}</h3>
-                <p className="text-[11px] text-slate-400">{meta.shortLabel}</p>
+                <h3 className="mt-2.5 text-sm font-bold text-slate-900 dark:text-white">{meta.name}</h3>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">{meta.shortLabel}</p>
               </div>
 
               {(isPrimary || isSecondary) && (
@@ -66,7 +66,7 @@ export default function DiscScoreCards({ scores, primaryTrait, secondaryTrait })
                     cy="48"
                     r={RING_RADIUS}
                     fill="none"
-                    stroke="rgba(255, 255, 255, 0.08)"
+                    className="stroke-slate-200 dark:stroke-white/10"
                     strokeWidth="7"
                   />
                   <motion.circle
@@ -85,7 +85,7 @@ export default function DiscScoreCards({ scores, primaryTrait, secondaryTrait })
                 </svg>
 
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-2xl font-extrabold text-white tabular-nums">{score}</span>
+                  <span className="text-2xl font-extrabold text-slate-900 tabular-nums dark:text-white">{score}</span>
                   <span className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
                     / 100
                   </span>
