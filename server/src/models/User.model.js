@@ -1,6 +1,59 @@
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 
+export const EDUCATION_LEVELS = [
+  'No Formal Education',
+  'High School / GED',
+  'Vocational / Technical Diploma',
+  'Associate Degree',
+  "Bachelor's Degree",
+  "Master's Degree",
+  'Doctorate / PhD',
+];
+
+const careerProfileSchema = new mongoose.Schema(
+  {
+    educationLevel: {
+      type: String,
+      enum: EDUCATION_LEVELS,
+      trim: true,
+    },
+    fieldOfStudy: {
+      type: String,
+      trim: true,
+      maxlength: [100, 'Field of study must be at most 100 characters'],
+    },
+    yearsOfExperience: {
+      type: Number,
+      min: [0, 'Years of experience cannot be negative'],
+      max: [60, 'Years of experience must be at most 60'],
+    },
+    age: {
+      type: Number,
+      min: [14, 'Age must be at least 14'],
+      max: [100, 'Age must be at most 100'],
+    },
+    completedAt: {
+      type: Date,
+    },
+  },
+  { _id: false }
+);
+
+export const isCareerProfileComplete = (profile) =>
+  Boolean(
+    profile &&
+      EDUCATION_LEVELS.includes(profile.educationLevel) &&
+      typeof profile.fieldOfStudy === 'string' &&
+      profile.fieldOfStudy.trim().length > 0 &&
+      typeof profile.yearsOfExperience === 'number' &&
+      Number.isFinite(profile.yearsOfExperience) &&
+      profile.yearsOfExperience >= 0 &&
+      typeof profile.age === 'number' &&
+      Number.isFinite(profile.age) &&
+      profile.age >= 14
+  );
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -23,6 +76,10 @@ const userSchema = new mongoose.Schema(
       required: [true, 'Password is required'],
       minlength: [8, 'Password must be at least 8 characters'],
       select: false,
+    },
+    careerProfile: {
+      type: careerProfileSchema,
+      default: null,
     },
   },
   {

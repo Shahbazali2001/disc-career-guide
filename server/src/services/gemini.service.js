@@ -6,7 +6,12 @@ import {
 } from './demoFallback.service.js';
 import { CAREER_FAMILIES, DISC_TRAITS } from './discScoring.service.js';
 
-const MODEL_CHAIN = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
+const DEFAULT_MODEL_CHAIN = ['gemini-3.5-flash-lite', 'gemini-3.5-flash'];
+const getModelChain = () => {
+  const configured = (process.env.GEMINI_MODEL ?? env.GEMINI_MODEL ?? '').trim();
+  const chain = [configured, ...DEFAULT_MODEL_CHAIN].filter(Boolean);
+  return [...new Set(chain)];
+};
 const FALLBACK_HTTP_STATUSES = new Set([404, 429, 500, 503]);
 const MAX_CHAT_HISTORY_MESSAGES = 12;
 
@@ -254,19 +259,20 @@ const validateAndNormalizeReport = (raw) => {
 };
 
 const callWithModelFallback = async (invokeFn) => {
+  const modelChain = getModelChain();
   let lastError = null;
 
-  for (let i = 0; i < MODEL_CHAIN.length; i += 1) {
-    const model = MODEL_CHAIN[i];
+  for (let i = 0; i < modelChain.length; i += 1) {
+    const model = modelChain[i];
     try {
       const result = await invokeFn(model);
       return { result, modelUsed: model };
     } catch (err) {
       lastError = err;
-      const isLast = i === MODEL_CHAIN.length - 1;
+      const isLast = i === modelChain.length - 1;
       if (!isLast && shouldFallbackModel(err)) {
         console.warn(
-          `[Gemini] Model "${model}" failed with HTTP ${extractHttpStatus(err)}; falling back to "${MODEL_CHAIN[i + 1]}".`
+          `[Gemini] Model "${model}" failed with HTTP ${extractHttpStatus(err)}; falling back to "${modelChain[i + 1]}".`
         );
         continue;
       }
@@ -279,18 +285,29 @@ const callWithModelFallback = async (invokeFn) => {
 
 /**
  * Generates a structured DISC Career Report via Gemini Structured Outputs.
- * Falls back from gemini-2.5-flash -> gemini-2.5-flash-lite on HTTP 404/429/500/503,
+ * Falls back from gemini-3.5-flash-lite -> gemini-3.5-flash on HTTP 404/429/500/503,
  * and falls back to demoFallback.service.js if API key is absent or all models fail.
  */
-export const generateCareerReport = async (scores, blendLabel) => {
+export const generateCareerReport = async (scores, blendLabel, careerProfile = null) => {
   const client = getGeminiClient();
   if (!client) {
     return {
-      report: generateDemoCareerReport(scores, blendLabel),
+      report: generateDemoCareerReport(scores, blendLabel, careerProfile),
       isDemoFallback: true,
       modelUsed: 'demo-fallback',
     };
   }
+
+  const profileLines = careerProfile
+    ? [
+        ``,
+        `User Background & Qualification Profile (CRITICAL — enforce strictly):`,
+        `- Education Level: ${careerProfile.educationLevel}`,
+        `- Field of Study: ${careerProfile.fieldOfStudy}`,
+        `- Years of Work Experience: ${careerProfile.yearsOfExperience}`,
+        `- Age: ${careerProfile.age}`,
+      ]
+    : [];
 
   const prompt = [
     `Generate a personalized DISC Career Guide report for a user with these self-reflection scores (0–100):`,
@@ -299,15 +316,19 @@ export const generateCareerReport = async (scores, blendLabel) => {
     `- Steadiness (S): ${scores.S}`,
     `- Conscientiousness (C): ${scores.C}`,
     `- Blend Label: ${blendLabel}`,
+    ...profileLines,
     ``,
     `Requirements:`,
     `1. styleTitle: memorable style headline (e.g., "CD Style: The Analytical Strategist").`,
-    `2. summary: 2–3 sentences describing work-style tendencies and explicitly noting that DISC is for self-reflection only, not a scientific diagnostic or hiring tool.`,
+    `2. summary: 2–3 sentences describing work-style tendencies tailored to the user's background, and explicitly noting that DISC is for self-reflection only, not a scientific diagnostic or hiring tool.`,
     `3. strengths: exactly 3 concise, practical workplace strengths.`,
     `4. growthAreas: 2–3 constructive workplace growth areas.`,
-    `5. careerFamilies: include ALL 8 exact families (${CAREER_FAMILIES.join('; ')}) with positive integer matchProbability values that sum to exactly 100.`,
+    `5. careerFamilies: include ALL 8 exact families (${CAREER_FAMILIES.join('; ')}) with positive integer matchProbability values that sum to exactly 100, weighted realistically for BOTH their DISC profile and their current education/experience qualifications.`,
     `6. recommendedJobs: exactly 20 diverse occupations spanning multiple career families, containing at least 12 office roles (isOfficeRole: true) and at least 8 non-office/hands-on roles (isOfficeRole: false), sorted by matchPercentage descending (integers 55–98).`,
-    `   Each job must include: title, family, isOfficeRole, matchPercentage, description (1–2 sentences), keySkills (3 concise skills), jobDiscProfile ({ D, I, S, C } integers 0–100), and firstStep (1 concrete actionable sentence).`,
+    `   STRICT QUALIFICATION ALIGNMENT RULE: Every single recommended job MUST be realistically attainable for the user's Education Level, Field of Study, Years of Experience, and Age.`,
+    `   - If the user has No Formal Education or High School / GED, NEVER recommend degree-gated, licensed, or senior roles (no Doctors, Lawyers, Registered Nurses, Software Architects, Management Consultants, Senior Managers, Directors, Data Scientists, etc.). Recommend realistic entry-level, clerical/support, sales, hospitality, logistics, trainee, apprenticeship, or hands-on roles they actually qualify for today.`,
+    `   - If the user has a Vocational/Associate/Bachelor's/Master's/PhD degree, align job domains with their Field of Study and calibrate seniority to their Years of Experience (0–1 yrs = entry/junior/trainee; 2–4 yrs = associate/mid-level; 5+ yrs = senior/lead/manager).`,
+    `   Each job must include: title, family, isOfficeRole, matchPercentage, description (1–2 sentences), keySkills (3 concise skills), jobDiscProfile ({ D, I, S, C } integers 0–100), and firstStep (1 concrete actionable sentence suited to their qualification level).`,
     `7. Never include fabricated salary numbers or fake labor statistics.`,
   ].join('\n');
 
@@ -339,35 +360,72 @@ export const generateCareerReport = async (scores, blendLabel) => {
   } catch (err) {
     console.warn(`[Gemini] Falling back to demo career report: ${err.message}`);
     return {
-      report: generateDemoCareerReport(scores, blendLabel),
+      report: generateDemoCareerReport(scores, blendLabel, careerProfile),
       isDemoFallback: true,
       modelUsed: 'demo-fallback',
     };
   }
 };
 
-const buildChatSystemInstruction = (scores) =>
-  [
+const buildChatSystemInstruction = (scores, assessment = null) => {
+  const aiReport = assessment?.aiReport || {};
+  const profile = assessment?.careerProfile || null;
+  const topFamilies = Array.isArray(aiReport.careerFamilies)
+    ? aiReport.careerFamilies
+        .slice(0, 4)
+        .map((f) => `${f.name} (${f.matchProbability}%)`)
+        .join(', ')
+    : '';
+
+  const jobsSummary = Array.isArray(aiReport.recommendedJobs)
+    ? aiReport.recommendedJobs
+        .slice(0, 20)
+        .map(
+          (j) =>
+            `${j.title} [${j.matchPercentage}% | ${j.isOfficeRole ? 'Office' : 'Field/Hands-On'} | ${j.family}]`
+        )
+        .join('; ')
+    : '';
+
+  return [
     'You are the DISC Career Guide Coach, a helpful career reflection assistant.',
     `The user's DISC self-reflection scores (0–100 scale) are: D=${scores.D}, I=${scores.I}, S=${scores.S}, C=${scores.C}.`,
+    assessment?.blendLabel ? `Blend Label: ${assessment.blendLabel}.` : '',
+    aiReport.styleTitle ? `Style Profile: ${aiReport.styleTitle}.` : '',
+    profile
+      ? `User Background: Education=${profile.educationLevel}, Field of Study=${profile.fieldOfStudy}, Experience=${profile.yearsOfExperience} year(s), Age=${profile.age}.`
+      : '',
+    Array.isArray(aiReport.strengths) && aiReport.strengths.length > 0
+      ? `Core Strengths: ${aiReport.strengths.join(' | ')}.`
+      : '',
+    Array.isArray(aiReport.growthAreas) && aiReport.growthAreas.length > 0
+      ? `Growth Areas: ${aiReport.growthAreas.join(' | ')}.`
+      : '',
+    topFamilies ? `Top Career Families: ${topFamilies}.` : '',
+    jobsSummary ? `Matched Roles from User's Report: ${jobsSummary}.` : '',
     '',
     'Strict Guardrails:',
+    '- Answer the user’s specific question directly using their DISC scores, background qualifications, and matched report details above.',
+    '- Only recommend roles and next steps that are realistically attainable for their current Education Level, Field of Study, Years of Experience, and Age (or clearly explain prerequisite training/credentials if they ask about a higher-barrier field).',
     '- Stay strictly focused on career exploration, skill development, job/role fit, and workplace communication.',
     '- Politely decline off-topic requests (e.g., medical, legal, political, or unrelated tasks) and steer back to career guidance.',
     '- Always treat DISC as a personal self-reflection framework only—NEVER recommend using DISC for hiring, screening, firing, or clinical diagnosis.',
     '- NEVER invent salary figures, pay ranges, or fake job market statistics; direct users to official sources (e.g., BLS or local labor data) if they ask for pay numbers.',
     '- Keep responses concise, practical, and actionable (typically 1–2 short paragraphs or crisp bullet points).',
-  ].join('\n');
+  ]
+    .filter(Boolean)
+    .join('\n');
+};
 
 /**
  * Generates a guardrailed multi-turn career chat reply via Gemini.
  * Sends at most the last 12 history messages for cost control.
  */
-export const generateChatReply = async (history, scores, userMessage) => {
+export const generateChatReply = async (history, scores, userMessage, assessment = null) => {
   const client = getGeminiClient();
   if (!client) {
     return {
-      reply: generateDemoChatReply(history, scores, userMessage),
+      reply: generateDemoChatReply(history, scores, userMessage, assessment),
       isDemo: true,
       modelUsed: 'demo-fallback',
     };
@@ -394,7 +452,7 @@ export const generateChatReply = async (history, scores, userMessage) => {
         model,
         contents,
         config: {
-          systemInstruction: buildChatSystemInstruction(scores),
+          systemInstruction: buildChatSystemInstruction(scores, assessment),
           temperature: 0.6,
         },
       });
@@ -414,7 +472,7 @@ export const generateChatReply = async (history, scores, userMessage) => {
   } catch (err) {
     console.warn(`[Gemini] Falling back to demo chat reply: ${err.message}`);
     return {
-      reply: generateDemoChatReply(history, scores, userMessage),
+      reply: generateDemoChatReply(history, scores, userMessage, assessment),
       isDemo: true,
       modelUsed: 'demo-fallback',
     };

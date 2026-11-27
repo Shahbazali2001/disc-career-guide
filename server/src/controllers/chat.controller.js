@@ -4,7 +4,9 @@ import { ChatSession } from '../models/ChatSession.model.js';
 import { generateChatReply } from '../services/gemini.service.js';
 
 const loadOwnedAssessment = async (assessmentId, userId) => {
-  const assessment = await Assessment.findById(assessmentId).select('_id userId scores').lean();
+  const assessment = await Assessment.findById(assessmentId)
+    .select('_id userId scores primaryTrait secondaryTrait blendLabel careerProfile aiReport')
+    .lean();
   if (!assessment) {
     throw new AppError('Assessment not found.', 404);
   }
@@ -18,6 +20,10 @@ export const sendChatMessage = async (req, res, next) => {
   try {
     const { assessmentId, message } = req.body;
     const assessment = await loadOwnedAssessment(assessmentId, req.user._id);
+    const enrichedAssessment = {
+      ...assessment,
+      careerProfile: assessment.careerProfile || req.user.careerProfile || null,
+    };
 
     let session = await ChatSession.findOne({
       userId: req.user._id,
@@ -35,7 +41,8 @@ export const sendChatMessage = async (req, res, next) => {
     const { reply, isDemo } = await generateChatReply(
       session.messages,
       assessment.scores,
-      message
+      message,
+      enrichedAssessment
     );
 
     const now = new Date();

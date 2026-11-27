@@ -1,18 +1,23 @@
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env.js';
 import { AppError } from '../middlewares/errorHandler.js';
-import { User } from '../models/User.model.js';
+import { isCareerProfileComplete, User } from '../models/User.model.js';
 
 const signToken = (userId) =>
   jwt.sign({ sub: userId.toString() }, env.JWT_SECRET, {
     expiresIn: env.JWT_EXPIRES_IN,
   });
 
-const sanitizeUser = (user) => ({
-  _id: user._id,
-  name: user.name,
-  email: user.email,
-});
+const sanitizeUser = (user) => {
+  const careerProfile = user.careerProfile || null;
+  return {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    careerProfile,
+    hasCareerProfile: isCareerProfileComplete(careerProfile),
+  };
+};
 
 export const register = async (req, res, next) => {
   try {
@@ -62,6 +67,40 @@ export const login = async (req, res, next) => {
 
 export const getMe = (req, res) => {
   res.status(200).json({
-    user: req.user,
+    user: sanitizeUser(req.user),
   });
+};
+
+export const updateCareerProfile = async (req, res, next) => {
+  try {
+    const { educationLevel, fieldOfStudy, yearsOfExperience, age } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        $set: {
+          careerProfile: {
+            educationLevel,
+            fieldOfStudy,
+            yearsOfExperience,
+            age,
+            completedAt: new Date(),
+          },
+        },
+      },
+      { new: true, runValidators: true }
+    )
+      .select('_id name email careerProfile')
+      .lean();
+
+    if (!user) {
+      return next(new AppError('User not found.', 404));
+    }
+
+    return res.status(200).json({
+      user: sanitizeUser(user),
+    });
+  } catch (err) {
+    return next(err);
+  }
 };

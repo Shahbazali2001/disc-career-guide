@@ -22,7 +22,7 @@ const envSchema = z.object({
     .default('change_me_in_production'),
   JWT_EXPIRES_IN: z.string().trim().min(1).default('7d'),
   GEMINI_API_KEY: z.string().trim().optional().default(''),
-  GEMINI_MODEL: z.string().trim().min(1).default('gemini-2.5-flash'),
+  GEMINI_MODEL: z.string().trim().min(1).default('gemini-3.5-flash-lite'),
   CLIENT_URL: z.string().trim().min(1).default('http://localhost:5173'),
 });
 

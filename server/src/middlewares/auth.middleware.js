@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env.js';
-import { User } from '../models/User.model.js';
+import { isCareerProfileComplete, User } from '../models/User.model.js';
 import { AppError } from './errorHandler.js';
 
 export const protect = async (req, _res, next) => {
@@ -23,12 +23,16 @@ export const protect = async (req, _res, next) => {
       return next(new AppError('Invalid authentication token payload.', 401));
     }
 
-    const user = await User.findById(userId).select('_id name email').lean();
+    const user = await User.findById(userId).select('_id name email careerProfile').lean();
     if (!user) {
       return next(new AppError('User belonging to this token no longer exists.', 401));
     }
 
-    req.user = user;
+    req.user = {
+      ...user,
+      careerProfile: user.careerProfile || null,
+      hasCareerProfile: isCareerProfileComplete(user.careerProfile),
+    };
     return next();
   } catch (err) {
     if (err.name === 'TokenExpiredError' || err.name === 'JsonWebTokenError') {

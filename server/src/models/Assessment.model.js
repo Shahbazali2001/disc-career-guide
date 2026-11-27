@@ -59,6 +59,12 @@ const assessmentSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    careerProfile: {
+      educationLevel: { type: String, trim: true },
+      fieldOfStudy: { type: String, trim: true },
+      yearsOfExperience: { type: Number },
+      age: { type: Number },
+    },
     aiReport: {
       type: aiReportSchema,
       default: () => ({}),

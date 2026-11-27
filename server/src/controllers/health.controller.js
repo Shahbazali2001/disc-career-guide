@@ -6,7 +6,7 @@ export const getHealth = (_req, res) => {
     ok: true,
     dbConnected: isDBConnected(),
     provider: 'gemini',
-    model: env.GEMINI_MODEL || 'gemini-2.5-flash',
+    model: env.GEMINI_MODEL || 'gemini-3.5-flash-lite',
     aiConfigured: Boolean(process.env.GEMINI_API_KEY?.trim()),
   });
 };

@@ -15,10 +15,30 @@ const verifyOwnership = (assessment, userId) => {
 
 export const createAssessment = async (req, res, next) => {
   try {
+    if (!req.user?.hasCareerProfile || !req.user?.careerProfile) {
+      return next(
+        new AppError(
+          'Please complete your background profile (Education Level, Field of Study, Years of Experience, and Age) before taking an assessment.',
+          400
+        )
+      );
+    }
+
     const { answers } = req.body;
+    const careerProfile = {
+      educationLevel: req.user.careerProfile.educationLevel,
+      fieldOfStudy: req.user.careerProfile.fieldOfStudy,
+      yearsOfExperience: req.user.careerProfile.yearsOfExperience,
+      age: req.user.careerProfile.age,
+    };
+
     const { scores, primaryTrait, secondaryTrait, blendLabel } = scoreDiscAnswers(answers);
 
-    const { report, isDemoFallback } = await generateCareerReport(scores, blendLabel);
+    const { report, isDemoFallback } = await generateCareerReport(
+      scores,
+      blendLabel,
+      careerProfile
+    );
 
     const assessment = await Assessment.create({
       userId: req.user._id,
@@ -27,6 +47,7 @@ export const createAssessment = async (req, res, next) => {
       primaryTrait,
       secondaryTrait,
       blendLabel,
+      careerProfile,
       aiReport: report,
       isDemoFallback,
     });
