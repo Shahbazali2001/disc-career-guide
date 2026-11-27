@@ -302,7 +302,7 @@ Validated on startup via Zod in [`server/src/config/env.js`](server/src/config/e
 | `JWT_SECRET` | Yes (prod) | `change_me_in_production` | Secret key used to sign/verify JWT tokens. Startup throws an error in `production` if left as the default. |
 | `JWT_EXPIRES_IN` | No | `7d` | JWT expiration window (e.g., `7d`, `24h`). |
 | `GEMINI_API_KEY` | No | `""` | Google Gemini API key. Leave empty to run in local Demo Mode. |
-| `GEMINI_MODEL` | No | `gemini-2.5-flash` | Reported Gemini model identifier in `/api/health`. |
+| `GEMINI_MODEL` | No | `gemini-3.5-flash-lite` | Primary Gemini model identifier (also reported in `/api/health`). |
 | `CLIENT_URL` | No | `http://localhost:5173` | Allowed CORS origin(s). Supports comma-separated URLs for multiple origins (e.g., `http://localhost:5173,https://your-app.com`). |
 
 ### Frontend (`client/.env`)
