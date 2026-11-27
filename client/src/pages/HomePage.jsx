@@ -23,7 +23,7 @@ const HOW_IT_WORKS_CARDS = [
       'Answer 12 concise workplace scenarios (3 per DISC dimension) with full keyboard shortcuts in under 2 minutes.',
     icon: ClipboardList,
     accent: '#F43F5E',
-    accentBg: 'bg-rose-500/15 text-rose-400 border-rose-500/30',
+    accentBg: 'bg-rose-500/10 text-rose-600 border-rose-500/30 dark:bg-rose-500/15 dark:text-rose-400',
     span: 'md:col-span-2',
   },
   {
@@ -33,7 +33,7 @@ const HOW_IT_WORKS_CARDS = [
       'Transparent 0–100 scoring across Dominance, Influence, Steadiness, and Conscientiousness reveals your primary & secondary blend.',
     icon: SlidersHorizontal,
     accent: '#F59E0B',
-    accentBg: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+    accentBg: 'bg-amber-500/10 text-amber-600 border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-400',
     span: 'md:col-span-2',
   },
   {
@@ -43,7 +43,7 @@ const HOW_IT_WORKS_CARDS = [
       'Gemini Structured Outputs match your blend across all 8 career families and 20 diverse office & hands-on occupations with actionable first steps.',
     icon: Briefcase,
     accent: '#10B981',
-    accentBg: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+    accentBg: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-400',
     span: 'md:col-span-2',
   },
   {
@@ -53,7 +53,7 @@ const HOW_IT_WORKS_CARDS = [
       'Chat with a personalized career reflection coach grounded in your DISC scores for interview stories, skill roadmaps, and team communication.',
     icon: Bot,
     accent: '#6366F1',
-    accentBg: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30',
+    accentBg: 'bg-indigo-500/10 text-indigo-600 border-indigo-500/30 dark:bg-indigo-500/15 dark:text-indigo-400',
     span: 'md:col-span-2',
   },
 ];
@@ -74,19 +74,19 @@ export default function HomePage() {
           transition={{ duration: 0.45 }}
           className="lg:col-span-7"
         >
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-400/25 bg-indigo-500/10 px-3.5 py-1.5 text-xs font-medium text-indigo-300">
-            <Sparkles className="h-3.5 w-3.5 text-indigo-400" />
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-500/25 bg-indigo-500/10 px-3.5 py-1.5 text-xs font-medium text-indigo-700 dark:border-indigo-400/25 dark:text-indigo-300">
+            <Sparkles className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
             <span>AI-Powered DISC Self-Reflection & Career Mapping</span>
           </div>
 
-          <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-[3.5rem] lg:leading-[1.08]">
+          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-5xl lg:text-[3.5rem] lg:leading-[1.08]">
             Decode your work style.{' '}
-            <span className="bg-gradient-to-r from-rose-400 via-amber-300 to-indigo-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-rose-500 via-amber-500 to-indigo-600 bg-clip-text text-transparent dark:from-rose-400 dark:via-amber-300 dark:to-indigo-400">
               Map your next career.
             </span>
           </h1>
 
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-slate-300 sm:text-lg">
+          <p className="mt-5 max-w-2xl text-base leading-relaxed text-slate-600 dark:text-slate-300 sm:text-lg">
             Discover your unique Dominance, Influence, Steadiness, and Conscientiousness blend in
             two minutes. Get structured insights across 8 career families, 20 office and hands-on
             occupations, and a guardrailed Gemini career coach.
@@ -118,10 +118,10 @@ export default function HomePage() {
             ].map((stat) => (
               <div
                 key={stat.label}
-                className="rounded-xl border border-white/10 bg-slate-900/50 px-3.5 py-3 backdrop-blur-md"
+                className="rounded-xl border border-slate-200/85 bg-white/75 px-3.5 py-3 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-slate-900/50 dark:shadow-none"
               >
-                <div className="text-2xl font-bold text-white tabular-nums">{stat.value}</div>
-                <div className="mt-0.5 text-xs text-slate-400">{stat.label}</div>
+                <div className="text-2xl font-bold text-slate-900 tabular-nums dark:text-white">{stat.value}</div>
+                <div className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -137,16 +137,16 @@ export default function HomePage() {
           <div className="glass-card relative overflow-hidden p-5 sm:p-6">
             {/* Ambient radial glow matching active quadrant */}
             <div
-              className="pointer-events-none absolute -right-12 -top-12 h-52 w-52 rounded-full opacity-25 blur-3xl transition-colors duration-500"
+              className="pointer-events-none absolute -right-12 -top-12 h-52 w-52 rounded-full opacity-20 blur-3xl transition-colors duration-500 dark:opacity-25"
               style={{ backgroundColor: activeMeta.hex }}
             />
 
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Interactive Preview
                 </p>
-                <h2 className="text-sm font-semibold text-white">Hover a DISC Quadrant</h2>
+                <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Hover a DISC Quadrant</h2>
               </div>
               <span
                 className={`rounded-full border px-2.5 py-1 text-xs font-semibold tabular-nums ${activeMeta.bgClass} ${activeMeta.borderClass} ${activeMeta.textClass}`}
@@ -174,31 +174,31 @@ export default function HomePage() {
                     }}
                     className={`group relative flex flex-col items-start rounded-xl border p-4 text-left transition-all duration-300 focus:outline-none ${
                       isActive
-                        ? 'scale-[1.02] bg-slate-900/95'
-                        : 'border-white/10 bg-slate-950/60 hover:border-white/20 hover:bg-slate-900/80'
+                        ? 'scale-[1.02] bg-white shadow-md dark:bg-slate-900/95'
+                        : 'border-slate-200/80 bg-slate-50/85 hover:border-slate-300 hover:bg-white dark:border-white/10 dark:bg-slate-950/60 dark:hover:border-white/20 dark:hover:bg-slate-900/80'
                     }`}
                   >
                     <div className="flex w-full items-center justify-between">
                       <span
-                        className="flex h-9 w-9 items-center justify-center rounded-lg text-base font-extrabold text-white shadow-inner"
+                        className="flex h-9 w-9 items-center justify-center rounded-lg text-base font-extrabold shadow-inner"
                         style={{
-                          backgroundColor: `${trait.hex}26`,
-                          border: `1px solid ${trait.hex}66`,
+                          backgroundColor: `${trait.hex}20`,
+                          border: `1px solid ${trait.hex}55`,
                           color: trait.hex,
                         }}
                       >
                         {trait.key}
                       </span>
-                      <span className="text-xs font-semibold text-slate-400 tabular-nums">
+                      <span className="text-xs font-semibold text-slate-500 tabular-nums dark:text-slate-400">
                         {trait.sampleScore}
                       </span>
                     </div>
 
-                    <h3 className="mt-3 text-sm font-bold text-white">{trait.name}</h3>
-                    <p className="mt-0.5 text-xs text-slate-400">{trait.shortLabel}</p>
+                    <h3 className="mt-3 text-sm font-bold text-slate-900 dark:text-white">{trait.name}</h3>
+                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{trait.shortLabel}</p>
 
                     {/* Mini animated bar */}
-                    <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                    <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-white/10">
                       <div
                         className="h-full rounded-full transition-all duration-500"
                         style={{
@@ -219,23 +219,23 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
-              className="mt-4 rounded-xl border border-white/10 bg-slate-950/70 p-4"
+              className="mt-4 rounded-xl border border-slate-200/85 bg-slate-50/90 p-4 dark:border-white/10 dark:bg-slate-950/70"
             >
               <div className="flex items-center gap-2">
                 <span
                   className="h-2 w-2 rounded-full"
                   style={{ backgroundColor: activeMeta.hex }}
                 />
-                <span className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                   {activeMeta.name} Tendencies
                 </span>
               </div>
-              <p className="mt-1.5 text-xs leading-relaxed text-slate-300">{activeMeta.summary}</p>
+              <p className="mt-1.5 text-xs leading-relaxed text-slate-600 dark:text-slate-300">{activeMeta.summary}</p>
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {activeMeta.traits.map((pill) => (
                   <span
                     key={pill}
-                    className="inline-flex items-center gap-1 rounded-md border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[11px] font-medium text-slate-300"
+                    className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-medium text-slate-700 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-300"
                   >
                     <CheckCircle2 className="h-3 w-3" style={{ color: activeMeta.hex }} />
                     {pill}
@@ -251,16 +251,16 @@ export default function HomePage() {
       <section className="mt-20 sm:mt-24">
         <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-indigo-400">
+            <p className="text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
               How It Works
             </p>
-            <h2 className="mt-1 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+            <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
               From 12 reflections to an actionable career map
             </h2>
           </div>
           <Link
             to="/test"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-300 transition-colors hover:text-indigo-200"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 transition-colors hover:text-indigo-500 dark:text-indigo-300 dark:hover:text-indigo-200"
           >
             <span>Take the 2-minute quiz</span>
             <ArrowRight className="h-4 w-4" />
@@ -277,10 +277,10 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.25 }}
                 transition={{ duration: 0.35, delay: index * 0.06 }}
-                className={`glass-card group relative overflow-hidden p-6 transition-all duration-300 hover:border-white/20 ${card.span}`}
+                className={`glass-card group relative overflow-hidden p-6 transition-all duration-300 hover:border-slate-300 dark:hover:border-white/20 ${card.span}`}
               >
                 <div
-                  className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full opacity-10 blur-2xl transition-opacity duration-300 group-hover:opacity-25"
+                  className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full opacity-10 blur-2xl transition-opacity duration-300 group-hover:opacity-20 dark:group-hover:opacity-25"
                   style={{ backgroundColor: card.accent }}
                 />
 
@@ -290,13 +290,13 @@ export default function HomePage() {
                   >
                     <Icon className="h-5 w-5" />
                   </div>
-                  <span className="text-xs font-bold tracking-widest text-slate-500 tabular-nums">
+                  <span className="text-xs font-bold tracking-widest text-slate-400 tabular-nums dark:text-slate-500">
                     STEP {card.step}
                   </span>
                 </div>
 
-                <h3 className="mt-5 text-lg font-bold text-white">{card.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate-400">{card.description}</p>
+                <h3 className="mt-5 text-lg font-bold text-slate-900 dark:text-white">{card.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">{card.description}</p>
               </motion.div>
             );
           })}

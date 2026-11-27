@@ -72,8 +72,8 @@ export default function RegisterPage() {
         <div className="pointer-events-none absolute -left-14 -top-14 h-40 w-40 rounded-full bg-rose-500/20 blur-3xl" />
 
         <div className="mb-6">
-          <h1 className="text-2xl font-bold tracking-tight text-white">Create your account</h1>
-          <p className="mt-1.5 text-sm text-slate-400">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Create your account</h1>
+          <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
             Save your DISC profiles, explore 20 matched roles, and continue coaching sessions anytime.
           </p>
         </div>
@@ -81,7 +81,7 @@ export default function RegisterPage() {
         {errorMsg && (
           <div
             role="alert"
-            className="mb-5 rounded-xl border border-rose-500/35 bg-rose-500/10 px-4 py-3 text-xs font-medium text-rose-200"
+            className="mb-5 rounded-xl border border-rose-500/35 bg-rose-500/10 px-4 py-3 text-xs font-medium text-rose-700 dark:text-rose-200"
           >
             {errorMsg}
           </div>
@@ -89,11 +89,11 @@ export default function RegisterPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div>
-            <label htmlFor="reg-name" className="mb-1.5 block text-xs font-medium text-slate-300">
+            <label htmlFor="reg-name" className="mb-1.5 block text-xs font-medium text-slate-700 dark:text-slate-300">
               Full Name
             </label>
             <div className="relative">
-              <User className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <User className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
               <input
                 id="reg-name"
                 type="text"
@@ -110,11 +110,11 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label htmlFor="reg-email" className="mb-1.5 block text-xs font-medium text-slate-300">
+            <label htmlFor="reg-email" className="mb-1.5 block text-xs font-medium text-slate-700 dark:text-slate-300">
               Email Address
             </label>
             <div className="relative">
-              <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
               <input
                 id="reg-email"
                 type="email"
@@ -130,13 +130,13 @@ export default function RegisterPage() {
 
           <div>
             <div className="mb-1.5 flex items-center justify-between">
-              <label htmlFor="reg-password" className="text-xs font-medium text-slate-300">
+              <label htmlFor="reg-password" className="text-xs font-medium text-slate-700 dark:text-slate-300">
                 Password
               </label>
               <span className="text-[11px] text-slate-500">Min 8 characters</span>
             </div>
             <div className="relative">
-              <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
               <input
                 id="reg-password"
                 type={showPassword ? 'text' : 'password'}
@@ -152,7 +152,7 @@ export default function RegisterPage() {
                 type="button"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 transition-colors hover:text-slate-200"
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-500 transition-colors hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -174,12 +174,12 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-xs text-slate-400">
+        <p className="mt-6 text-center text-xs text-slate-600 dark:text-slate-400">
           Already have an account?{' '}
           <Link
             to="/login"
             state={location.state}
-            className="font-semibold text-indigo-400 transition-colors hover:text-indigo-300"
+            className="font-semibold text-indigo-600 transition-colors hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
           >
             Log in
           </Link>

@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { AUTH_TOKEN_KEY, AUTH_USER_KEY } from '../api/axiosClient.js';
-import { getMe, loginUser, registerUser } from '../api/careerApi.js';
+import { getMe, loginUser, registerUser, updateCareerProfile } from '../api/careerApi.js';
 
 const AuthContext = createContext(null);
 
@@ -90,9 +90,26 @@ export function AuthProvider({ children }) {
     [persistSession]
   );
 
+  const saveCareerProfile = useCallback(async (profilePayload) => {
+    const data = await updateCareerProfile(profilePayload);
+    if (data?.user) {
+      setUser(data.user);
+      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
+    }
+    return data;
+  }, []);
+
   const logout = useCallback(() => {
     clearSession();
   }, [clearSession]);
+
+  const hasCareerProfile = Boolean(
+    user?.hasCareerProfile ||
+      (user?.careerProfile?.educationLevel &&
+        user?.careerProfile?.fieldOfStudy &&
+        typeof user?.careerProfile?.yearsOfExperience === 'number' &&
+        typeof user?.careerProfile?.age === 'number')
+  );
 
   const value = useMemo(
     () => ({
@@ -100,11 +117,13 @@ export function AuthProvider({ children }) {
       token,
       isLoading,
       isAuthenticated: Boolean(token && user),
+      hasCareerProfile,
       login,
       register,
+      saveCareerProfile,
       logout,
     }),
-    [user, token, isLoading, login, register, logout]
+    [user, token, isLoading, hasCareerProfile, login, register, saveCareerProfile, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

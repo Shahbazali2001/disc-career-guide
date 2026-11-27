@@ -5,8 +5,10 @@ import {
   ArrowRight,
   Check,
   CheckCircle2,
+  GraduationCap,
   Keyboard,
   Loader2,
+  Pencil,
   Sparkles,
 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
@@ -14,6 +16,8 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { extractApiError } from '../api/axiosClient.js';
 import { createAssessment } from '../api/careerApi.js';
+import CareerProfileForm from '../components/assessment/CareerProfileForm.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 import { DISC_META, DISC_QUESTIONS, LIKERT_OPTIONS } from '../data/discQuestions.js';
 
 const LOADING_STEPS = [
@@ -40,11 +44,15 @@ const slideVariants = {
 export default function AssessmentPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user, hasCareerProfile, saveCareerProfile } = useAuth();
 
+  const [editingProfile, setEditingProfile] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [answers, setAnswers] = useState(() => Array(DISC_QUESTIONS.length).fill(null));
   const [loadingStage, setLoadingStage] = useState(0);
+
+  const showProfileGate = !hasCareerProfile || editingProfile;
 
   const currentQuestion = DISC_QUESTIONS[currentIndex];
   const currentMeta = DISC_META[currentQuestion.trait];
@@ -127,7 +135,7 @@ export default function AssessmentPage() {
 
   // Keyboard shortcuts: 1-5 to select, Enter / ArrowRight for next, ArrowLeft for back
   useEffect(() => {
-    if (mutation.isPending) return undefined;
+    if (mutation.isPending || showProfileGate) return undefined;
 
     const onKeyDown = (e) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -148,7 +156,21 @@ export default function AssessmentPage() {
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [handleBack, handleNextOrSubmit, handleSelect, mutation.isPending]);
+  }, [handleBack, handleNextOrSubmit, handleSelect, mutation.isPending, showProfileGate]);
+
+  if (showProfileGate) {
+    return (
+      <CareerProfileForm
+        initialProfile={user?.careerProfile}
+        isEditing={hasCareerProfile && editingProfile}
+        onSave={async (profilePayload) => {
+          await saveCareerProfile(profilePayload);
+          setEditingProfile(false);
+        }}
+        onCancel={hasCareerProfile ? () => setEditingProfile(false) : undefined}
+      />
+    );
+  }
 
   if (mutation.isPending) {
     return (
@@ -161,12 +183,12 @@ export default function AssessmentPage() {
           <div className="pointer-events-none absolute -left-16 -top-16 h-48 w-48 rounded-full bg-indigo-500/20 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-16 -right-16 h-48 w-48 rounded-full bg-rose-500/20 blur-3xl" />
 
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-indigo-400/30 bg-indigo-500/15">
-            <Sparkles className="h-7 w-7 animate-pulse text-indigo-300" />
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-indigo-500/30 bg-indigo-500/10 dark:border-indigo-400/30 dark:bg-indigo-500/15">
+            <Sparkles className="h-7 w-7 animate-pulse text-indigo-600 dark:text-indigo-300" />
           </div>
 
-          <h2 className="mt-5 text-xl font-bold text-white">Building Your Career Blueprint</h2>
-          <p className="mt-1.5 text-sm text-slate-400">
+          <h2 className="mt-5 text-xl font-bold text-slate-900 dark:text-white">Building Your Career Blueprint</h2>
+          <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
             Personalizing your DISC blend report and matching roles...
           </p>
 
@@ -179,18 +201,18 @@ export default function AssessmentPage() {
                   key={label}
                   className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-sm transition-all duration-300 ${
                     isActive
-                      ? 'border-indigo-400/40 bg-indigo-500/15 text-white'
+                      ? 'border-indigo-500/40 bg-indigo-500/10 text-indigo-950 dark:border-indigo-400/40 dark:bg-indigo-500/15 dark:text-white'
                       : isDone
-                        ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200'
-                        : 'border-white/5 bg-slate-950/40 text-slate-500'
+                        ? 'border-emerald-500/35 bg-emerald-500/10 text-emerald-800 dark:border-emerald-500/30 dark:text-emerald-200'
+                        : 'border-slate-200 bg-slate-100/70 text-slate-500 dark:border-white/5 dark:bg-slate-950/40'
                   }`}
                 >
                   {isDone ? (
-                    <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
                   ) : isActive ? (
-                    <Loader2 className="h-4 w-4 shrink-0 animate-spin text-indigo-400" />
+                    <Loader2 className="h-4 w-4 shrink-0 animate-spin text-indigo-600 dark:text-indigo-400" />
                   ) : (
-                    <span className="h-4 w-4 shrink-0 rounded-full border border-slate-700" />
+                    <span className="h-4 w-4 shrink-0 rounded-full border border-slate-300 dark:border-slate-700" />
                   )}
                   <span className="font-medium">{label}</span>
                 </div>
@@ -204,11 +226,40 @@ export default function AssessmentPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+      {/* Saved Background Profile Pill (Optional Edit) */}
+      {user?.careerProfile && (
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-200/85 bg-white/75 px-3.5 py-2 text-xs text-slate-600 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-300 dark:shadow-none">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <GraduationCap className="h-3.5 w-3.5 shrink-0 text-indigo-600 dark:text-indigo-400" />
+            <span className="font-semibold text-slate-900 dark:text-white">
+              {user.careerProfile.educationLevel}
+            </span>
+            <span className="text-slate-400">·</span>
+            <span>{user.careerProfile.fieldOfStudy}</span>
+            <span className="text-slate-400">·</span>
+            <span className="tabular-nums">
+              {user.careerProfile.yearsOfExperience}{' '}
+              {user.careerProfile.yearsOfExperience === 1 ? 'yr' : 'yrs'} exp
+            </span>
+            <span className="text-slate-400">·</span>
+            <span className="tabular-nums">Age {user.careerProfile.age}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setEditingProfile(true)}
+            className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold text-indigo-600 transition hover:bg-indigo-500/10 hover:text-indigo-700 dark:text-indigo-300 dark:hover:text-indigo-200"
+          >
+            <Pencil className="h-3 w-3" />
+            <span>Edit</span>
+          </button>
+        </div>
+      )}
+
       {/* Progress Header */}
       <div className="mb-6">
-        <div className="flex items-center justify-between text-xs font-medium text-slate-400">
+        <div className="flex items-center justify-between text-xs font-medium text-slate-500 dark:text-slate-400">
           <span className="tabular-nums">
-            Question <strong className="text-white">{currentIndex + 1}</strong> of{' '}
+            Question <strong className="text-slate-900 dark:text-white">{currentIndex + 1}</strong> of{' '}
             {DISC_QUESTIONS.length}
           </span>
           <span className="tabular-nums">
@@ -216,7 +267,7 @@ export default function AssessmentPage() {
           </span>
         </div>
 
-        <div className="mt-2.5 h-2 w-full overflow-hidden rounded-full bg-white/10">
+        <div className="mt-2.5 h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-white/10">
           <motion.div
             className="h-full rounded-full"
             style={{ backgroundColor: currentMeta.hex }}
@@ -249,7 +300,9 @@ export default function AssessmentPage() {
                       : undefined,
                 }}
                 className={`h-1.5 flex-1 rounded-full transition-all duration-200 ${
-                  !isCurrent && !isAnswered ? 'bg-white/10 hover:bg-white/20' : ''
+                  !isCurrent && !isAnswered
+                    ? 'bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20'
+                    : ''
                 }`}
               />
             );
@@ -260,7 +313,7 @@ export default function AssessmentPage() {
       {/* Animated Question Card */}
       <div className="glass-card relative overflow-hidden p-6 sm:p-8">
         <div
-          className="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full opacity-20 blur-3xl transition-colors duration-500"
+          className="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full opacity-15 blur-3xl transition-colors duration-500 dark:opacity-20"
           style={{ backgroundColor: currentMeta.hex }}
         />
 
@@ -285,11 +338,11 @@ export default function AssessmentPage() {
                 />
                 {currentMeta.key} · {currentMeta.name}
               </span>
-              <span className="text-xs text-slate-400">{currentQuestion.context}</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400">{currentQuestion.context}</span>
             </div>
 
             {/* Statement */}
-            <h1 className="mt-5 text-xl font-bold leading-snug text-white sm:text-2xl">
+            <h1 className="mt-5 text-xl font-bold leading-snug text-slate-900 dark:text-white sm:text-2xl">
               &ldquo;{currentQuestion.statement}&rdquo;
             </h1>
 
@@ -306,21 +359,21 @@ export default function AssessmentPage() {
                     onClick={() => handleSelect(option.value)}
                     style={{
                       borderColor: isSelected ? currentMeta.hex : undefined,
-                      backgroundColor: isSelected ? `${currentMeta.hex}20` : undefined,
+                      backgroundColor: isSelected ? `${currentMeta.hex}18` : undefined,
                       boxShadow: isSelected ? `0 0 24px -10px ${currentMeta.hex}` : undefined,
                     }}
                     className={`group flex w-full items-center justify-between rounded-xl border px-4 py-3.5 text-left transition-all duration-150 ${
                       isSelected
-                        ? 'text-white'
-                        : 'border-white/10 bg-slate-950/60 text-slate-300 hover:border-white/25 hover:bg-slate-900/90 hover:text-white'
+                        ? 'text-slate-950 dark:text-white'
+                        : 'border-slate-200 bg-slate-50/90 text-slate-700 hover:border-slate-300 hover:bg-white hover:text-slate-950 dark:border-white/10 dark:bg-slate-950/60 dark:text-slate-300 dark:hover:border-white/25 dark:hover:bg-slate-900/90 dark:hover:text-white'
                     }`}
                   >
                     <div className="flex items-center gap-3.5">
                       <span
                         className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border text-xs font-bold tabular-nums transition-colors ${
                           isSelected
-                            ? 'border-white/30 bg-white/15 text-white'
-                            : 'border-white/10 bg-white/[0.04] text-slate-400 group-hover:text-slate-200'
+                            ? 'border-slate-900/15 bg-white/80 text-slate-900 dark:border-white/30 dark:bg-white/15 dark:text-white'
+                            : 'border-slate-200 bg-white text-slate-500 group-hover:text-slate-900 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-400 dark:group-hover:text-slate-200'
                         }`}
                       >
                         {option.value}
@@ -344,7 +397,7 @@ export default function AssessmentPage() {
         </AnimatePresence>
 
         {/* Footer Controls */}
-        <div className="mt-8 flex items-center justify-between gap-3 border-t border-white/10 pt-5">
+        <div className="mt-8 flex items-center justify-between gap-3 border-t border-slate-200 pt-5 dark:border-white/10">
           <button
             type="button"
             onClick={handleBack}
@@ -382,23 +435,23 @@ export default function AssessmentPage() {
             Shortcuts:
           </span>
           <span>
-            <kbd className="rounded border border-white/15 bg-white/5 px-1.5 py-0.5 font-mono text-slate-300">
+            <kbd className="rounded border border-slate-300 bg-slate-100 px-1.5 py-0.5 font-mono text-slate-700 dark:border-white/15 dark:bg-white/5 dark:text-slate-300">
               1–5
             </kbd>{' '}
             Select
           </span>
           <span>
-            <kbd className="rounded border border-white/15 bg-white/5 px-1.5 py-0.5 font-mono text-slate-300">
+            <kbd className="rounded border border-slate-300 bg-slate-100 px-1.5 py-0.5 font-mono text-slate-700 dark:border-white/15 dark:bg-white/5 dark:text-slate-300">
               Enter
             </kbd>{' '}
             /{' '}
-            <kbd className="rounded border border-white/15 bg-white/5 px-1.5 py-0.5 font-mono text-slate-300">
+            <kbd className="rounded border border-slate-300 bg-slate-100 px-1.5 py-0.5 font-mono text-slate-700 dark:border-white/15 dark:bg-white/5 dark:text-slate-300">
               →
             </kbd>{' '}
             Next
           </span>
           <span>
-            <kbd className="rounded border border-white/15 bg-white/5 px-1.5 py-0.5 font-mono text-slate-300">
+            <kbd className="rounded border border-slate-300 bg-slate-100 px-1.5 py-0.5 font-mono text-slate-700 dark:border-white/15 dark:bg-white/5 dark:text-slate-300">
               ←
             </kbd>{' '}
             Back

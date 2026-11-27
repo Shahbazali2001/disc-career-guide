@@ -60,19 +60,19 @@ export default function HistoryPage() {
   return (
     <div className="mx-auto max-w-7xl space-y-6 px-4 pb-16 pt-8 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="flex flex-col justify-between gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-center">
+      <div className="flex flex-col justify-between gap-4 border-b border-slate-200 pb-6 dark:border-white/10 sm:flex-row sm:items-center">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+            <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
               My Assessment History
             </h1>
             {!isLoading && (
-              <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-0.5 text-xs font-bold text-slate-300 tabular-nums">
+              <span className="rounded-full border border-slate-200 bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-700 tabular-nums dark:border-white/10 dark:bg-white/[0.05] dark:text-slate-300">
                 {assessments.length}
               </span>
             )}
           </div>
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
             Revisit your past DISC blends, explore matched occupations, or continue coaching chats.
           </p>
         </div>
@@ -95,9 +95,9 @@ export default function HistoryPage() {
       {/* Error State */}
       {isError && (
         <div className="glass-card p-8 text-center">
-          <AlertTriangle className="mx-auto h-10 w-10 text-rose-400" />
-          <h2 className="mt-3 text-lg font-bold text-white">Failed to load history</h2>
-          <p className="mt-1 text-sm text-slate-400">
+          <AlertTriangle className="mx-auto h-10 w-10 text-rose-500 dark:text-rose-400" />
+          <h2 className="mt-3 text-lg font-bold text-slate-900 dark:text-white">Failed to load history</h2>
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
             {extractApiError(error, 'Please refresh the page to try again.')}
           </p>
         </div>
@@ -110,11 +110,11 @@ export default function HistoryPage() {
           animate={{ opacity: 1, y: 0 }}
           className="glass-card mx-auto max-w-xl p-10 text-center"
         >
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-indigo-400/30 bg-indigo-500/15 text-indigo-300">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-indigo-500/30 bg-indigo-500/10 text-indigo-600 dark:border-indigo-400/30 dark:bg-indigo-500/15 dark:text-indigo-300">
             <Sparkles className="h-7 w-7" />
           </div>
-          <h2 className="mt-5 text-xl font-bold text-white">No saved assessments yet</h2>
-          <p className="mt-2 text-sm leading-relaxed text-slate-400">
+          <h2 className="mt-5 text-xl font-bold text-slate-900 dark:text-white">No saved assessments yet</h2>
+          <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
             Complete the 2-minute 12-question DISC reflection to unlock your personalized blend
             report, 8 career families breakdown, 20 matched jobs, and AI Career Coach.
           </p>
@@ -138,7 +138,7 @@ export default function HistoryPage() {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.25, delay: Math.min(idx * 0.04, 0.3) }}
-                className="glass-card group relative flex flex-col justify-between overflow-hidden p-5 transition-all duration-200 hover:border-white/20"
+                className="glass-card group relative flex flex-col justify-between overflow-hidden p-5 transition-all duration-200 hover:border-slate-300 dark:hover:border-white/20"
               >
                 <div
                   className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full opacity-15 blur-2xl"
@@ -149,12 +149,12 @@ export default function HistoryPage() {
                   {/* Date + Demo Badge + Delete Button */}
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="inline-flex items-center gap-1.5 text-xs text-slate-400 tabular-nums">
-                        <Calendar className="h-3.5 w-3.5 text-slate-500" />
+                      <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 tabular-nums dark:text-slate-400">
+                        <Calendar className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
                         {formatDateTime(item.createdAt)}
                       </span>
                       {item.isDemoFallback && (
-                        <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-300">
+                        <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:text-amber-300">
                           Demo
                         </span>
                       )}
@@ -164,7 +164,7 @@ export default function HistoryPage() {
                       type="button"
                       aria-label={`Delete assessment ${item.aiReport?.styleTitle || item.blendLabel}`}
                       onClick={() => setConfirmTarget(item)}
-                      className="rounded-lg border border-transparent p-1.5 text-slate-500 transition hover:border-rose-500/35 hover:bg-rose-500/10 hover:text-rose-300"
+                      className="rounded-lg border border-transparent p-1.5 text-slate-400 transition hover:border-rose-500/35 hover:bg-rose-500/10 hover:text-rose-600 dark:text-slate-500 dark:hover:text-rose-300"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -177,7 +177,7 @@ export default function HistoryPage() {
                     >
                       {item.blendLabel}
                     </span>
-                    <h2 className="mt-2 text-base font-bold leading-snug text-white">
+                    <h2 className="mt-2 text-base font-bold leading-snug text-slate-900 dark:text-white">
                       {item.aiReport?.styleTitle || `${item.blendLabel} Profile`}
                     </h2>
                   </div>
@@ -190,12 +190,12 @@ export default function HistoryPage() {
                       return (
                         <div
                           key={trait}
-                          className="flex flex-col items-center rounded-xl border border-white/10 bg-slate-950/70 py-2"
+                          className="flex flex-col items-center rounded-xl border border-slate-200 bg-slate-50/90 py-2 dark:border-white/10 dark:bg-slate-950/70"
                         >
                           <span className="text-[10px] font-bold" style={{ color: meta.hex }}>
                             {trait}
                           </span>
-                          <span className="mt-0.5 text-sm font-extrabold text-white tabular-nums">
+                          <span className="mt-0.5 text-sm font-extrabold text-slate-900 tabular-nums dark:text-white">
                             {val}
                           </span>
                         </div>
@@ -205,10 +205,10 @@ export default function HistoryPage() {
                 </div>
 
                 {/* Quick Action Buttons */}
-                <div className="mt-5 grid grid-cols-3 gap-2 border-t border-white/10 pt-4">
+                <div className="mt-5 grid grid-cols-3 gap-2 border-t border-slate-200 pt-4 dark:border-white/10">
                   <Link
                     to={`/results/${item._id}`}
-                    className="inline-flex items-center justify-center gap-1 rounded-xl border border-indigo-400/30 bg-indigo-500/15 px-2.5 py-2 text-xs font-semibold text-indigo-200 transition hover:bg-indigo-500/25 hover:text-white"
+                    className="inline-flex items-center justify-center gap-1 rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-2.5 py-2 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-500/20 hover:text-indigo-900 dark:border-indigo-400/30 dark:bg-indigo-500/15 dark:text-indigo-200 dark:hover:bg-indigo-500/25 dark:hover:text-white"
                   >
                     <BarChart3 className="h-3.5 w-3.5" />
                     <span>Results</span>
@@ -216,7 +216,7 @@ export default function HistoryPage() {
 
                   <Link
                     to={`/jobs/${item._id}`}
-                    className="inline-flex items-center justify-center gap-1 rounded-xl border border-white/10 bg-white/[0.04] px-2.5 py-2 text-xs font-semibold text-slate-200 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white"
+                    className="inline-flex items-center justify-center gap-1 rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-100 hover:text-slate-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-200 dark:hover:border-white/20 dark:hover:bg-white/[0.08] dark:hover:text-white"
                   >
                     <Briefcase className="h-3.5 w-3.5" />
                     <span>Jobs</span>
@@ -224,7 +224,7 @@ export default function HistoryPage() {
 
                   <Link
                     to={`/chat/${item._id}`}
-                    className="inline-flex items-center justify-center gap-1 rounded-xl border border-white/10 bg-white/[0.04] px-2.5 py-2 text-xs font-semibold text-slate-200 transition hover:border-emerald-400/35 hover:bg-emerald-500/10 hover:text-emerald-200"
+                    className="inline-flex items-center justify-center gap-1 rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs font-semibold text-slate-700 transition hover:border-emerald-500/35 hover:bg-emerald-500/10 hover:text-emerald-700 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-200 dark:hover:border-emerald-400/35 dark:hover:text-emerald-200"
                   >
                     <Bot className="h-3.5 w-3.5" />
                     <span>Chat</span>
@@ -250,23 +250,23 @@ export default function HistoryPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => !deleteMutation.isPending && setConfirmTarget(null)}
-              className="fixed inset-0 bg-black/75 backdrop-blur-sm"
+              className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm dark:bg-black/75"
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
-              className="glass-card relative z-10 w-full max-w-md border-white/15 bg-slate-900/95 p-6"
+              className="glass-card relative z-10 w-full max-w-md border-slate-200 bg-white/95 p-6 dark:border-white/15 dark:bg-slate-900/95"
             >
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-rose-500/35 bg-rose-500/15 text-rose-400">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-rose-500/35 bg-rose-500/15 text-rose-600 dark:text-rose-400">
                 <Trash2 className="h-5 w-5" />
               </div>
-              <h2 id="delete-confirm-title" className="mt-4 text-lg font-bold text-white">
+              <h2 id="delete-confirm-title" className="mt-4 text-lg font-bold text-slate-900 dark:text-white">
                 Delete this assessment?
               </h2>
-              <p className="mt-2 text-sm leading-relaxed text-slate-400">
+              <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                 This will permanently remove{' '}
-                <strong className="text-slate-200">
+                <strong className="text-slate-900 dark:text-slate-200">
                   {confirmTarget.aiReport?.styleTitle || confirmTarget.blendLabel}
                 </strong>{' '}
                 and its linked AI Career Coach conversation history.

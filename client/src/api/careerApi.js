@@ -20,6 +20,11 @@ export const getMe = async () => {
   return data;
 };
 
+export const updateCareerProfile = async (profile) => {
+  const { data } = await axiosClient.put('/auth/profile', profile);
+  return data;
+};
+
 export const createAssessment = async (answers) => {
   const { data } = await axiosClient.post('/assessments', { answers });
   return data;
